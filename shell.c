@@ -5,7 +5,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-int main()
+extern char **environ; 
+
+int main(int argc, char **argv)
 {
 	char *str = NULL;
 	size_t n;
@@ -23,10 +25,10 @@ int main()
 	char **arr = malloc(sizeof(char *) * 32);
 
 	arr[0] = stkn;
-
+/*
 	if (strcmp(arr[0], "exit") == 0)
 		exit(0);
-
+*/
 	i = 1;
 
 	while (stkn != NULL)
@@ -34,6 +36,19 @@ int main()
 		stkn = strtok(NULL, " \n");
 		arr[i] = stkn;
 		i++;
+	}
+	if (strcmp(arr[0], "exit") == 0 && (arr[1] == NULL))
+		exit(0);
+
+	if (strcmp(arr[0], "exit") == 0 && (arr[1] == NULL))
+	{
+		i = 0;
+		while (environ[i] != NULL)
+		{
+			printf("%s\n", environ[i]);
+			i++;
+		}                
+		continue;
 	}
 
 	mypid = fork();
@@ -44,7 +59,11 @@ int main()
 	}
 	else if (mypid == 0)/*solves the issue of exiting*/
 	{
-	execve(arr[0], arr, NULL);
+		if (execve(arr[0], arr, NULL) == -1)
+		{
+			perror(argv[0]);
+			return (0);
+		}
 	}
 	else
 	{
