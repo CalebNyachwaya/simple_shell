@@ -1,57 +1,87 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
-int main()
+#include "shell.h"
+/**
+ * sig_handler - checks if Ctrl C is pressed
+ * @sig_num: int
+ */
+void sig_handler(int sig_num)
 {
-	char *str = NULL;
-	size_t n;
-	char *stkn;
-	pid_t mypid;
-	int status, i;
-
-	while (1)
+	if (sig_num == SIGINT)
 	{
-	printf("$ ");
-	getline(&str, &n, stdin);
+		_puts("\n#$ ");
+	}
+}
 
-	stkn = strtok(str, " \n");/*solves the issue of executing command*/
-
-	char **arr = malloc(sizeof(char *) * 32);
-
-	arr[0] = stkn;
-
-	if (strcmp(arr[0], "exit") == 0)
+/**
+* _EOF - handles the End of File
+* @len: return value of getline function
+* @buff: buffer
+ */
+void _EOF(int len, char *buff)
+{
+	(void)buff;
+	if (len == -1)
+	{
+		if (isatty(STDIN_FILENO))
+		{
+			_puts("\n");
+			free(buff);
+		}
 		exit(0);
+	}
+}
+/**
+  * _isatty - verif if terminal
+  */
 
-	i = 1;
+void _isatty(void)
+{
+	if (isatty(STDIN_FILENO))
+		_puts("$ ");
+}
+/**
+ * main - Shell
+ * Return: 0 on success
+ */
+int main(void)
+{
+	ssize_t len = 0;
+	char *buff = NULL, *value, *pathname, **arv;
+	size_t size = 0;
+	list_path *head = '\0';
+	void (*f)(char **);
 
-	while (stkn != NULL)
+	signal(SIGINT, sig_handler);
+	while (len != EOF)
 	{
-		stkn = strtok(NULL, " \n");
-		arr[i] = stkn;
-		i++;
+		_isatty();
+		len = getline(&buff, &size, stdin);
+		_EOF(len, buff);
+		arv = splitstring(buff, " \n");
+		if (!arv || !arv[0])
+			execute(arv);
+		else
+		{
+			value = _getenv("PATH");
+			head = linkpath(value);
+			pathname = _which(arv[0], head);
+			f = checkbuild(arv);
+			if (f)
+			{
+				free(buff);
+				f(arv);
+			}
+			else if (!pathname)
+				execute(arv);
+			else if (pathname)
+			{
+				free(arv[0]);
+				arv[0] = pathname;
+				execute(arv);
+			}
+		}
 	}
-
-	mypid = fork();
-	if (mypid == -1)
-	{
-		perror("Error");
-		return (1);
-	}
-	else if (mypid == 0)/*solves the issue of exiting*/
-	{
-	execve(arr[0], arr, NULL);
-	}
-	else
-	{
-		wait(NULL);/*suspends the parent from action until the child finishes*/
-	}
-	}
-
-	free(str);
+	free_list(head);
+	freearv(arv);
+	free(buff);
 	return (0);
 }
