@@ -38,7 +38,7 @@ int main(__attribute__((unused)) int argc, char **argv)
 		arr[i] = stkn;
 		i++;
 	}
-	if (strcmp(arr[0], "exit") == 0 && (arr[1] == NULL))
+/*&	if (strcmp(arr[0], "exit") == 0 && (arr[1] == NULL))
 		exit(0);
 
 	if (strcmp(arr[0], "exit") == 0 && (arr[1] == NULL))
@@ -51,7 +51,7 @@ int main(__attribute__((unused)) int argc, char **argv)
 		}                
 		continue;
 	}
-
+*/
 	mypid = fork();
 	if (mypid == -1)
 	{
