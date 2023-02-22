@@ -7,7 +7,7 @@ void sig_handler(int sig_num)
 {
 	if (sig_num == SIGINT)
 	{
-		_puts("\n#cisfun$$ ");
+		_puts("\n#cisfun$ ");
 	}
 }
 
