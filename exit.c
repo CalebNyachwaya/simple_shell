@@ -7,12 +7,11 @@
 
 extern char **environ; 
 
-int main(__attribute__((unused)) int argc, char **argv)
+int main()
 {
 	char *str = NULL;
-	size_t n;
 	char *stkn;
-	pid_t mypid;
+	size_t n;
 	int i;
 	char **arr;
 
@@ -26,10 +25,6 @@ int main(__attribute__((unused)) int argc, char **argv)
 	arr = malloc(sizeof(char *) * 32);
 
 	arr[0] = stkn;
-/*
-	if (strcmp(arr[0], "exit") == 0)
-		exit(0);
-*/
 	i = 1;
 
 	while (stkn != NULL)
@@ -50,26 +45,5 @@ int main(__attribute__((unused)) int argc, char **argv)
 		}                
 		continue;
 	}
-	mypid = fork();
-	if (mypid == -1)
-	{
-		perror("Error");
-		return (1);
 	}
-	else if (mypid == 0)/*solves the issue of exiting*/
-	{
-		if (execve(arr[0], arr, NULL) == -1)
-		{
-			perror(argv[0]);
-			return (0);
-		}
-	}
-	else
-	{
-		wait(NULL);/*suspends the parent from action until the child finishes*/
-	}
-	}
-
-	free(str);
-	return (0);
 }
