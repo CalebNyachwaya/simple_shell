@@ -7,13 +7,14 @@
 
 extern char **environ; 
 
-int main(int argc, char **argv)
+int main(__attribute__((unused)) int argc, char **argv)
 {
 	char *str = NULL;
 	size_t n;
 	char *stkn;
 	pid_t mypid;
-	int status, i;
+	int i;
+	char **arr;
 
 	while (1)
 	{
@@ -22,7 +23,7 @@ int main(int argc, char **argv)
 
 	stkn = strtok(str, " \n");/*solves the issue of executing command*/
 
-	char **arr = malloc(sizeof(char *) * 32);
+	arr = malloc(sizeof(char *) * 32);
 
 	arr[0] = stkn;
 /*
